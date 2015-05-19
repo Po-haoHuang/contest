@@ -862,10 +862,10 @@ def readCommand( argv ):
   nokeyboard = options.textgraphics or options.quiet or options.numTraining > 0
   print '\nRed team %s with %s:' % (options.red, redArgs)
   redAgents = loadAgents(True, options.red, nokeyboard, redArgs)
+  #print(len(redAgents))
   print '\nBlue team %s with %s:' % (options.blue, blueArgs)
   blueAgents = loadAgents(False, options.blue, nokeyboard, blueArgs)
   args['agents'] = sum([list(el) for el in zip(redAgents, blueAgents)],[]) # list of agents
-
   numKeyboardAgents = 0
   for index, val in enumerate([options.keys0, options.keys1, options.keys2, options.keys3]):
     if not val: continue
@@ -921,7 +921,7 @@ def loadAgents(isRed, factory, textgraphics, cmdLineArgs):
   except (NameError, ImportError):
     print >>sys.stderr, 'Error: The team "' + factory + '" could not be loaded! '
     traceback.print_exc()
-    return [None for i in range(2)]
+    return [None for i in range(3)]
 
   args = dict()
   args.update(cmdLineArgs)  # Add command line args with priority
@@ -937,13 +937,13 @@ def loadAgents(isRed, factory, textgraphics, cmdLineArgs):
   except AttributeError:
     print >>sys.stderr, 'Error: The team "' + factory + '" could not be loaded! '
     traceback.print_exc()
-    return [None for i in range(2)]
+    return [None for i in range(3)]
 
   indexAddend = 0
   if not isRed:
     indexAddend = 1
-  indices = [2*i + indexAddend for i in range(2)]
-  return createTeamFunc(indices[0], indices[1], isRed, **args)
+  indices = [2*i + indexAddend for i in range(3)]
+  return createTeamFunc(indices[0], indices[1], indices[2], isRed, **args)
 
 def replayGame( layout, agents, actions, display, length, redTeamName, blueTeamName ):
     rules = CaptureRules()
@@ -967,7 +967,6 @@ def runGames( layouts, agents, display, length, numGames, record, numTraining, r
 
   rules = CaptureRules()
   games = []
-
   if numTraining > 0:
     print 'Playing %d training games' % numTraining
 
@@ -997,7 +996,7 @@ def runGames( layouts, agents, display, length, numGames, record, numTraining, r
       g.record = cPickle.dumps(components)
       with open('replay-%d'%i,'wb') as f:
         f.write(g.record)
-
+    print('out')
   if numGames > 1:
     scores = [game.state.data.score for game in games]
     redWinRate = [s > 0 for s in scores].count(True)/ float(len(scores))
@@ -1007,6 +1006,7 @@ def runGames( layouts, agents, display, length, numGames, record, numTraining, r
     print 'Red Win Rate:  %d/%d (%.2f)' % ([s > 0 for s in scores].count(True), len(scores), redWinRate)
     print 'Blue Win Rate: %d/%d (%.2f)' % ([s < 0 for s in scores].count(True), len(scores), blueWinRate)
     print 'Record:       ', ', '.join([('Blue', 'Tie', 'Red')[max(0, min(2, 1 + s))] for s in scores])
+
   return games
 
 def save_score(game):

@@ -575,6 +575,7 @@ class Game:
         # inform learning agents of the game start
         for i in range(len(self.agents)):
             agent = self.agents[i]
+            #print(i)
             if not agent:
                 self.mute(i)
                 # this is a null agent, meaning it failed to load
@@ -583,8 +584,9 @@ class Game:
                 self.unmute()
                 self._agentCrash(i, quiet=True)
                 return
+            #print('hi')
             if ("registerInitialState" in dir(agent)):
-                self.mute(i)
+                self.mute(i)                
                 if self.catchExceptions:
                     try:
                         timed_func = TimeoutFunction(agent.registerInitialState, int(self.rules.getMaxStartupTime(i)))
@@ -592,7 +594,7 @@ class Game:
                             start_time = time.time()
                             timed_func(self.state.deepCopy())
                             time_taken = time.time() - start_time
-                            self.totalAgentTimes[i] += time_taken
+                            self.totalAgentTimes[i] += time_taken                            
                         except TimeoutFunctionException:
                             print >>sys.stderr, "Agent %d ran out of time on startup!" % i
                             self.unmute()
@@ -601,15 +603,19 @@ class Game:
                             return
                     except Exception,data:
                         self._agentCrash(i, quiet=False)
-                        self.unmute()
+                        self.unmute()        
                         return
                 else:
+                    #print(self.state.getAgentPosition(agent.index))
                     agent.registerInitialState(self.state.deepCopy())
+                    #print('mid')
                 ## TODO: could this exceed the total time
                 self.unmute()
-
+            #print('end')
+                
         agentIndex = self.startingIndex
         numAgents = len( self.agents )
+        
 
         while not self.gameOver:
             # Fetch the next agent
