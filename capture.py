@@ -65,14 +65,14 @@ import keyboardAgents
 
 # If you change these, you won't affect the server, so you can't cheat
 # TODO Some impotant var!!!
-# TODO close dump on death? lose arbitrry points on death
+# TODO close dump on death? lose arbitrry points on death(turn off temporary)
 KILL_POINTS = 0
 SONAR_NOISE_RANGE = 13 # Must be odd
 SONAR_NOISE_VALUES = [i - (SONAR_NOISE_RANGE - 1)/2 for i in range(SONAR_NOISE_RANGE)]
 SIGHT_RANGE = 5 # Manhattan distance
 MIN_FOOD = 2
 TOTAL_FOOD = 60
-DUMP_FOOD_ON_DEATH = True # if we have the gameplay element that dumps dots on death
+DUMP_FOOD_ON_DEATH = False # if we have the gameplay element that dumps dots on death
 SCARED_TIME = 40
 
 def noisyDistance(pos1, pos2):
@@ -524,10 +524,10 @@ class AgentRules:
 # TODO modify score? arbitrary score?
       # blue case is the default
       teamIndicesFunc = state.getBlueTeamIndices
-      score = -1
+      score = -random.randint(1,5)
       if isRed:
         # switch if its red
-        score = 1
+        score = random.randint(1,5)
         teamIndicesFunc = state.getRedTeamIndices
 
       # go increase the variable for the pacman who ate this
@@ -538,7 +538,7 @@ class AgentRules:
           break # the above should only be true for one agent...
 
       # do all the score and food grid maintainenace 
-      #state.data.scoreChange += score
+      state.data.scoreChange += score
       state.data.food = state.data.food.copy()
       state.data.food[x][y] = False
       state.data._foodEaten = position
