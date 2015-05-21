@@ -379,6 +379,7 @@ class GameStateData:
         if prevState != None:
             self.food = prevState.food.shallowCopy()
             self.capsules = prevState.capsules[:]
+            self.flags = prevState.flags[:]
             self.agentStates = self.copyAgentStates( prevState.agentStates )
             self.layout = prevState.layout
             self._eaten = prevState._eaten
@@ -489,7 +490,7 @@ class GameStateData:
         Creates an initial game state from a layout array (see layout.py).
         """
         self.food = layout.food.copy()
-        #self.capsules = []
+        self.flags = layout.flags[:]
         self.capsules = layout.capsules[:]
         self.layout = layout
         self.score = 0

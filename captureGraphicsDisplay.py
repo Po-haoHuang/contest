@@ -65,7 +65,8 @@ PACMAN_SCALE = 0.5
 #pacman_speed = 0.25
 
 # TODO flag 
-
+FLAG_COLOR = formatColor(1,0,0)
+FLAG_SIZE = 0.5
 # Food
 FOOD_COLOR = formatColor(1,1,1)
 FOOD_SIZE = 0.1
@@ -227,6 +228,7 @@ class PacmanGraphics:
     self.drawWalls(layout.walls)
     self.food = self.drawFood(layout.food)
     self.capsules = self.drawCapsules(layout.capsules)
+    self.flags = self.drawFlags(layout.flags)
     refresh()
 
   def drawAgentObjects(self, state):
@@ -578,6 +580,18 @@ class PacmanGraphics:
                         width = 1)
       capsuleImages[capsule] = dot
     return capsuleImages
+
+  def drawFlags(self, flags ):
+    flagImages = {}
+    for flag in flags:
+      ( screen_x, screen_y ) = self.to_screen(flag)
+      dot = circle( (screen_x, screen_y),
+                        FLAG_SIZE * self.gridSize,
+                        outlineColor = FLAG_COLOR,
+                        fillColor = FLAG_COLOR,
+                        width = 1)
+      flagImages[flag] = dot
+    return flagImages
 
   def removeFood(self, cell, foodImages ):
     x, y = cell

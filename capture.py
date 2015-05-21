@@ -486,6 +486,7 @@ class AgentRules:
     next = agentState.configuration.getPosition()
     nearest = nearestPoint( next )
 # TODO limit change agent type(in our case always 1 pacman two ghost)
+# TODO or just say we think in this way it's fun...
     if next == nearest:
       isRed = state.isOnRedTeam(agentIndex)
       # Change agent type
@@ -521,7 +522,7 @@ class AgentRules:
     x,y = position
     # Eat food
     if state.data.food[x][y]:
-# TODO modify score? arbitrary score?
+# TODO modify score? arbitrary score?(beta done)
       # blue case is the default
       teamIndicesFunc = state.getBlueTeamIndices
       score = -random.randint(1,5)
@@ -931,7 +932,7 @@ def loadAgents(isRed, factory, textgraphics, cmdLineArgs):
 
   # if textgraphics and factoryClassName.startswith('Keyboard'):
   #   raise Exception('Using the keyboard requires graphics (no text display, quiet or training games)')
-# TODO increment to 1 pacman 2 ghost
+# TODO increment to 1 pacman 2 ghost(beta done)
   try:
     createTeamFunc = getattr(module, 'createTeam')
   except AttributeError:
