@@ -21,8 +21,8 @@ import game
 # Team creation #
 #################
 
-def createTeam(firstIndex, secondIndex, isRed,
-               first = 'DummyAgent', second = 'DummyAgent'):
+def createTeam(firstIndex, secondIndex, thirdIndex, isRed,
+               first = 'DummyAgent', second = 'DummyAgent', third = 'DummyAgent'):
   """
   This function should return a list of two agents that will form the
   team, initialized using firstIndex and secondIndex as their agent
@@ -39,7 +39,7 @@ def createTeam(firstIndex, secondIndex, isRed,
   """
 
   # The following line is an example only; feel free to change it.
-  return [eval(first)(firstIndex), eval(second)(secondIndex)]
+  return [eval(first)(firstIndex), eval(second)(secondIndex), eval(third)(thirdIndex)]
 
 ##########
 # Agents #
