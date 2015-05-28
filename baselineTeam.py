@@ -35,7 +35,7 @@ def createTeam(firstIndex, secondIndex, thirdIndex, isRed,
                first = 'OffensiveReflexAgent', second = 'DefensiveReflexAgent',
                third = 'DefensiveReflexAgent'):
   """
-  This function should return a list of two agents that will form the
+  This function should return a list of three agents that will form the
   team, initialized using firstIndex and secondIndex as their agent
   index numbers.  isRed is True if the red team is being created, and
   will be False if the blue team is being created.
