@@ -395,6 +395,7 @@ class CaptureRules:
       if not game.rules.quiet:
         redCount = 0
         blueCount = 0
+        # TODO: enable "food to win" or not?
         foodToWin = (TOTAL_FOOD/2) - MIN_FOOD
         for index in range(state.getNumAgents()):
           agentState = state.data.agentStates[index]
