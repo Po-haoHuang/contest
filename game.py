@@ -129,6 +129,7 @@ class AgentState:
         self.scaredTimer = 0
         self.numCarrying = 0
         self.numReturned = 0
+        self.ownFlag = False
 
     def __str__( self ):
         if self.isPacman:
@@ -150,6 +151,8 @@ class AgentState:
         state.scaredTimer = self.scaredTimer
         state.numCarrying = self.numCarrying
         state.numReturned = self.numReturned
+        # TODO keep ownFlag
+        state.ownFlag = self.ownFlag
         return state
 
     def getPosition(self):
@@ -388,6 +391,8 @@ class GameStateData:
         self._foodEaten = None
         self._foodAdded = None
         self._capsuleEaten = None
+        # TODO flagEaten init here
+        self._flagEaten = None
         self._agentMoved = None
         self._lose = False
         self._win = False
@@ -401,6 +406,7 @@ class GameStateData:
         state._foodEaten = self._foodEaten
         state._foodAdded = self._foodAdded
         state._capsuleEaten = self._capsuleEaten
+        state._flagEaten = self._flagEaten
         return state
 
     def copyAgentStates( self, agentStates ):
@@ -415,12 +421,14 @@ class GameStateData:
         """
         if other == None: return False
         ## TODO Check for type of other
+        # TODO compare state add flag
         if not self.agentStates == other.agentStates: return False
         if not self.food == other.food: return False
         if not self.capsules == other.capsules: return False
         if not self.score == other.score: return False
+        if not self.flags == other.flags: return False
         return True
-
+    # TODO don't know hashing here add flags or not? no modify for now if problem maybe here
     def __hash__( self ):
         """
         Allows states to be keys of dictionaries.
@@ -455,6 +463,10 @@ class GameStateData:
 
         for x, y in self.capsules:
             map[x][y] = 'o'
+        
+        # TODO flag in str output
+        for x, y in self.flags:
+            map[x][y] = 'F'        
 
         return str(map) + ("\nScore: %d\n" % self.score)
 

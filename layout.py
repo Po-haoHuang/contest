@@ -104,6 +104,7 @@ class Layout:
          o - Capsule
          G - Ghost
          P - Pacman
+		 F - Flag
         Other characters are ignored.
         """
         maxY = self.height - 1

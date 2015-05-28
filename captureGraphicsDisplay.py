@@ -228,6 +228,7 @@ class PacmanGraphics:
     self.drawWalls(layout.walls)
     self.food = self.drawFood(layout.food)
     self.capsules = self.drawCapsules(layout.capsules)
+    # TODO draw flag be called here
     self.flags = self.drawFlags(layout.flags)
     refresh()
 
@@ -272,6 +273,9 @@ class PacmanGraphics:
       self.removeFood(newState._foodEaten, self.food)
     if newState._capsuleEaten != None:
       self.removeCapsule(newState._capsuleEaten, self.capsules)
+    # TODO remove flag when eaten here
+    if newState._flagEaten != None:
+      self.removeFlag(newState._flagEaten, self.flags)
     # dumping food
     if newState._foodAdded != None:
       for foodPos in newState._foodAdded:
@@ -580,7 +584,7 @@ class PacmanGraphics:
                         width = 1)
       capsuleImages[capsule] = dot
     return capsuleImages
-
+  # TODO draw flag api
   def drawFlags(self, flags ):
     flagImages = {}
     for flag in flags:
@@ -617,6 +621,10 @@ class PacmanGraphics:
   def removeCapsule(self, cell, capsuleImages ):
     x, y = cell
     remove_from_screen(capsuleImages[(x, y)])
+  # TODO remove flag api    
+  def removeFlag(self, cell, flagImages ):
+    x, y = cell
+    remove_from_screen(flagImages[(x, y)])
 
   def drawExpandedCells(self, cells):
     """

@@ -204,7 +204,21 @@ class CaptureAgent(Agent):
       return gameState.getRedCapsules()
     else:
       return gameState.getBlueCapsules()
+	  
+  # TODO get self flag pos and opponent's
+  def getFlags(self, gameState):
+    if self.red:
+      return gameState.getBlueFlags()
+    else:
+      return gameState.getRedFlags()
 
+  def getFlagsYouAreDefending(self, gameState):
+    if self.red:
+      return gameState.getRedFlags()
+    else:
+      return gameState.getBlueFlags()
+
+	  
   def getOpponents(self, gameState):
     """
     Returns agent indices of your opponents. This is the list of the numbers

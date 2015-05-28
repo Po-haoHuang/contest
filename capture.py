@@ -115,7 +115,10 @@ class GameState:
     # Find appropriate rules for the agent
     AgentRules.applyAction( state, action, agentIndex )
     AgentRules.checkDeath(state, agentIndex)
+    # TODO increment scorer used here
+    AgentRules.incrementScorer(state, state.data.agentStates[agentIndex], agentIndex, state.isOnRedTeam(agentIndex))
     AgentRules.decrementTimer(state.data.agentStates[agentIndex])
+
 
     # Book keeping
     state.data._agentMoved = agentIndex
@@ -167,6 +170,12 @@ class GameState:
 
   def getBlueCapsules(self):
     return halfList(self.data.capsules, self.data.food, red = False)
+  # TODO get red blue flag implement 
+  def getRedFlags(self):
+    return halfList(self.data.flags, self.data.food, red = True)
+
+  def getBlueFlags(self):
+    return halfList(self.data.flags, self.data.food, red = False)
 
   def getWalls(self):
     """
@@ -346,8 +355,8 @@ def halfList(l, grid, red):
   halfway = grid.width / 2
   newList = []
   for x,y in l:
-    if red and x <= halfway: newList.append((x,y))
-    elif not red and x > halfway: newList.append((x,y))
+    if red and x < halfway: newList.append((x,y))
+    elif not red and x >= halfway: newList.append((x,y))
   return newList
 
 ############################################################################
@@ -496,7 +505,9 @@ class AgentRules:
       # if he's no longer pacman, he's on his own side, so reset the num carrying timer
       #agentState.numCarrying *= int(agentState.isPacman)
       if agentState.numCarrying > 0 and not agentState.isPacman:
-        score = agentState.numCarrying if isRed else -1*agentState.numCarrying
+        # TODO score = agentState.numCarrying if isRed else -1*agentState.numCarrying
+        # TODO temp disable one point score per numcarrying
+        score = 0
         state.data.scoreChange += score
 
         agentState.numReturned += agentState.numCarrying
@@ -546,6 +557,21 @@ class AgentRules:
       state.data._foodEaten = position
       #if (isRed and state.getBlueFood().count() == MIN_FOOD) or (not isRed and state.getRedFood().count() == MIN_FOOD):
       #  state.data._win = True
+      
+    # Eat flag
+    if isRed: 
+        myFlags = state.getBlueFlags()
+        teamIndicesFunc = state.getRedTeamIndices
+    else: 
+        myFlags = state.getRedFlags()
+        teamIndicesFunc = state.getBlueTeamIndices
+    if( position in myFlags ):
+      state.data.flags.remove( position )
+      state.data._flagEaten = position
+      agents = [state.data.agentStates[agentIndex] for agentIndex in teamIndicesFunc()]
+      for agent in agents:
+        if agent.getPosition() == position:
+          agent.ownFlag = True
 
     # Eat capsule
     if isRed: myCapsules = state.getBlueCapsules()
@@ -563,6 +589,15 @@ class AgentRules:
   consume = staticmethod( consume )
 
 # TODO combine decrement with flag(or increement)
+
+  def incrementScorer(state, agentState, agentIndex, isRed):
+    if agentState.ownFlag: 
+      if isRed:
+        state.data.scoreChange += 1
+      else:
+        state.data.scoreChange -= 1
+  incrementScorer = staticmethod( incrementScorer )
+
   def decrementTimer(state):
     timer = state.scaredTimer
     if timer == 1:
@@ -623,6 +658,9 @@ class AgentRules:
         return False
 
       if (x,y) in state.data.capsules:
+        return False
+      # TODO if encounter flag something trigger
+      if (x,y) in state.data.flags:
         return False
 
       # loop through agents
@@ -693,6 +731,7 @@ class AgentRules:
               score = -score
             state.data.scoreChange += score
             agentState.isPacman = False
+            agentState.ownFlag = False
             agentState.configuration = agentState.start
             agentState.scaredTimer = 0
           else:
@@ -701,6 +740,7 @@ class AgentRules:
               score = -score
             state.data.scoreChange += score
             otherAgentState.isPacman = False
+            otherAgentState.ownFlag = False
             otherAgentState.configuration = otherAgentState.start
             otherAgentState.scaredTimer = 0
     else: # Agent is a ghost
@@ -719,6 +759,7 @@ class AgentRules:
               score = -score
             state.data.scoreChange += score
             otherAgentState.isPacman = False
+            otherAgentState.ownFlag = False
             otherAgentState.configuration = otherAgentState.start
             otherAgentState.scaredTimer = 0
           else:
@@ -727,6 +768,7 @@ class AgentRules:
               score = -score
             state.data.scoreChange += score
             agentState.isPacman = False
+            agentState.ownFlag = False
             agentState.configuration = agentState.start
             agentState.scaredTimer = 0
   checkDeath = staticmethod( checkDeath )
@@ -802,7 +844,7 @@ def readCommand( argv ):
                     help=default('Zoom in the graphics'), default=1)
   parser.add_option('-i', '--time', type='int', dest='time',
                     help=default('TIME limit of a game in moves'), default=1200, metavar='TIME')
-					#TODO defaul time is here
+					# TODO defaul time is here
   parser.add_option('-n', '--numGames', type='int',
                     help=default('Number of games to play'), default=1)
   parser.add_option('-f', '--fixRandomSeed', action='store_true',
