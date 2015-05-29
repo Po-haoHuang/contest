@@ -65,7 +65,7 @@ import keyboardAgents
 
 # If you change these, you won't affect the server, so you can't cheat
 # TODO Some impotant var!!!
-# TODO close dump on death? lose arbitrry points on death(turn off temporary)
+# TODO close dump on death? lose arbitrary points on death(turn off temporary)
 KILL_POINTS = 0
 SONAR_NOISE_RANGE = 13 # Must be odd
 SONAR_NOISE_VALUES = [i - (SONAR_NOISE_RANGE - 1)/2 for i in range(SONAR_NOISE_RANGE)]
@@ -74,6 +74,7 @@ MIN_FOOD = 2
 TOTAL_FOOD = 60
 DUMP_FOOD_ON_DEATH = False # if we have the gameplay element that dumps dots on death
 SCARED_TIME = 40
+SCORE_FOOD = 10 # score per dot
 
 def noisyDistance(pos1, pos2):
   return int(util.manhattanDistance(pos1, pos2) + random.choice(SONAR_NOISE_VALUES))
@@ -410,8 +411,9 @@ class CaptureRules:
       if not game.rules.quiet:
         redCount = 0
         blueCount = 0
-        # TODO: enable "food to win" or not?
-        foodToWin = (TOTAL_FOOD/2) - MIN_FOOD
+        # Disable "food to win"
+        #foodToWin = (TOTAL_FOOD/2) - MIN_FOOD
+        foodToWin = 999999
         for index in range(state.getNumAgents()):
           agentState = state.data.agentStates[index]
           if index in state.getRedTeamIndices():
@@ -540,13 +542,13 @@ class AgentRules:
     x,y = position
     # Eat food
     if state.data.food[x][y]:
-# TODO modify score? arbitrary score?(beta done)
+      # TODO modify score? arbitrary score?(beta done)
       # blue case is the default
       teamIndicesFunc = state.getBlueTeamIndices
-      score = -random.randint(1,5)
+      score = -SCORE_FOOD
       if isRed:
         # switch if its red
-        score = random.randint(1,5)
+        score = SCORE_FOOD
         teamIndicesFunc = state.getRedTeamIndices
 
       # go increase the variable for the pacman who ate this
@@ -594,7 +596,7 @@ class AgentRules:
 
   consume = staticmethod( consume )
 
-# TODO combine decrement with flag(or increement)
+  # TODO combine decrement with flag(or increement)
 
   def incrementScorer(state, agentState, agentIndex, isRed):
     if agentState.ownFlag: 
@@ -911,8 +913,11 @@ def readCommand( argv ):
     __main__.__dict__['_display'] = args['display']
 
 
-  args['redTeamName'] = options.red_name
-  args['blueTeamName'] = options.blue_name
+  #args['redTeamName'] = options.red_name
+  #args['blueTeamName'] = options.blue_name
+  # Take [myTeam].py as team names instead
+  args['redTeamName'] = options.red
+  args['blueTeamName'] = options.blue
 
   if options.fixRandomSeed: random.seed('cs188')
 
@@ -1031,7 +1036,10 @@ def replayGame( layout, agents, actions, display, length, redTeamName, blueTeamN
       display.update( state.data )
       # Allow for game specific conditions (winning, losing, etc.)
       rules.process(state, game)
-
+    
+    # Display the result
+    print 'Score: %d' % state.data.score
+    
     display.finish()
 
 def runGames( layouts, agents, display, length, numGames, record, numTraining, redTeamName, blueTeamName, muteAgents=False, catchExceptions=False ):
@@ -1065,9 +1073,9 @@ def runGames( layouts, agents, display, length, numGames, record, numTraining, r
       #f.close()
       print "recorded"
       g.record = cPickle.dumps(components)
-      with open('replay-%d'%i,'wb') as f:
+      with open('[Replay] %s v.s. %s.prp' %(redTeamName, blueTeamName),'wb') as f:
         f.write(g.record)
-    print('out')
+      print('out')
   if numGames > 1:
     scores = [game.state.data.score for game in games]
     redWinRate = [s > 0 for s in scores].count(True)/ float(len(scores))
