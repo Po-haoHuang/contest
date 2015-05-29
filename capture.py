@@ -242,6 +242,12 @@ class GameState:
     Returns a list of positions (x,y) of the remaining capsules.
     """
     return self.data.capsules
+# TODO get remaining flags    
+  def getFlags(self):
+    """
+    Returns a list of positions (x,y) of the remaining flags.
+    """
+    return self.data.flags
 
   #############################################
   #             Helper methods:               #
@@ -723,7 +729,7 @@ class AgentRules:
         if ghostPosition == None: continue
         if manhattanDistance( ghostPosition, agentState.getPosition() ) <= COLLISION_TOLERANCE:
           # award points to the other team for killing Pacmen
-          if otherAgentState.scaredTimer <= 0:
+          if otherAgentState.scaredTimer <= 0 and not otherAgentState.ownFlag:
             AgentRules.dumpFoodFromDeath(state, agentState, agentIndex)
 
             score = KILL_POINTS
@@ -743,6 +749,16 @@ class AgentRules:
             otherAgentState.ownFlag = False
             otherAgentState.configuration = otherAgentState.start
             otherAgentState.scaredTimer = 0
+            if agentState.ownFlag:
+              AgentRules.dumpFoodFromDeath(state, agentState, agentIndex)
+              score = KILL_POINTS
+              if state.isOnRedTeam(agentIndex):
+                score = -score
+              state.data.scoreChange += score
+              agentState.isPacman = False
+              agentState.ownFlag = False
+              agentState.configuration = agentState.start
+              agentState.scaredTimer = 0                
     else: # Agent is a ghost
       for index in otherTeam:
         otherAgentState = state.data.agentStates[index]
@@ -751,7 +767,7 @@ class AgentRules:
         if pacPos == None: continue
         if manhattanDistance( pacPos, agentState.getPosition() ) <= COLLISION_TOLERANCE:
           #award points to the other team for killing Pacmen
-          if agentState.scaredTimer <= 0:
+          if agentState.scaredTimer <= 0 and not agentState.ownFlag:
             AgentRules.dumpFoodFromDeath(state, otherAgentState, agentIndex)
 
             score = KILL_POINTS
@@ -771,6 +787,16 @@ class AgentRules:
             agentState.ownFlag = False
             agentState.configuration = agentState.start
             agentState.scaredTimer = 0
+            if otherAgentState.ownFlag:
+              AgentRules.dumpFoodFromDeath(state, otherAgentState, agentIndex)              
+              score = KILL_POINTS
+              if not state.isOnRedTeam(agentIndex):
+                score = -score
+              state.data.scoreChange += score
+              otherAgentState.isPacman = False
+              otherAgentState.ownFlag = False
+              otherAgentState.configuration = otherAgentState.start
+              otherAgentState.scaredTimer = 0
   checkDeath = staticmethod( checkDeath )
 
   def placeGhost(state, ghostState):
@@ -844,7 +870,7 @@ def readCommand( argv ):
                     help=default('Zoom in the graphics'), default=1)
   parser.add_option('-i', '--time', type='int', dest='time',
                     help=default('TIME limit of a game in moves'), default=1200, metavar='TIME')
-					# TODO defaul time is here
+                    # TODO defaul time is here
   parser.add_option('-n', '--numGames', type='int',
                     help=default('Number of games to play'), default=1)
   parser.add_option('-f', '--fixRandomSeed', action='store_true',

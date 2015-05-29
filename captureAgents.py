@@ -228,6 +228,22 @@ class CaptureAgent(Agent):
       return gameState.getBlueTeamIndices()
     else:
       return gameState.getRedTeamIndices()
+#get own flag oppenent id	  
+  def getOwnFlagOpponent(self, gameState):
+    """
+    Returns agent indice of your opponents which owned flag. This is the number
+    of the agent (e.g., red might be one within "1,3,5")
+    """
+    if self.red:
+	  for i in gameState.getBlueTeamIndices():
+		if gameState.data.agentStates[i].ownFlag:
+			return i
+		else: return None
+    else:
+	  for i in gameState.getRedTeamIndices():
+		if gameState.data.agentStates[i].ownFlag:
+			return i
+		else: return None
 
   def getTeam(self, gameState):
     """
