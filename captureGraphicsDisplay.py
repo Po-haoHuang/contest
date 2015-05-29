@@ -65,6 +65,7 @@ PACMAN_SCALE = 0.5
 #pacman_speed = 0.25
 
 # TODO flag 
+FLAG_COLOR = formatColor(0,1,0)
 FLAG_SIZE = 0.5
 # Food
 FOOD_COLOR = formatColor(1,1,1)
