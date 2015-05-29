@@ -66,8 +66,9 @@ import keyboardAgents
 # If you change these, you won't affect the server, so you can't cheat
 # TODO Some impotant var!!!
 # TODO close dump on death? lose arbitrary points on death(turn off temporary)
-KILL_POINTS = 0
-SONAR_NOISE_RANGE = 13 # Must be odd
+KILL_POINTS_PACMAN = 25 # points for killing a pacman
+KILL_POINTS_GHOST = 50 # points for killing a ghost
+SONAR_NOISE_RANGE = 7 # Must be odd
 SONAR_NOISE_VALUES = [i - (SONAR_NOISE_RANGE - 1)/2 for i in range(SONAR_NOISE_RANGE)]
 SIGHT_RANGE = 5 # Manhattan distance
 MIN_FOOD = 2
@@ -75,6 +76,7 @@ TOTAL_FOOD = 60
 DUMP_FOOD_ON_DEATH = False # if we have the gameplay element that dumps dots on death
 SCARED_TIME = 40
 SCORE_FOOD = 10 # score per dot
+FLAG_SCORE_RATE = 2 # the points provided by flag per action
 
 def noisyDistance(pos1, pos2):
   return int(util.manhattanDistance(pos1, pos2) + random.choice(SONAR_NOISE_VALUES))
@@ -601,9 +603,9 @@ class AgentRules:
   def incrementScorer(state, agentState, agentIndex, isRed):
     if agentState.ownFlag: 
       if isRed:
-        state.data.scoreChange += 1
+        state.data.scoreChange += FLAG_SCORE_RATE
       else:
-        state.data.scoreChange -= 1
+        state.data.scoreChange -= FLAG_SCORE_RATE
   incrementScorer = staticmethod( incrementScorer )
 
   def decrementTimer(state):
@@ -734,7 +736,7 @@ class AgentRules:
           if otherAgentState.scaredTimer <= 0 and not otherAgentState.ownFlag:
             AgentRules.dumpFoodFromDeath(state, agentState, agentIndex)
 
-            score = KILL_POINTS
+            score = KILL_POINTS_PACMAN
             if state.isOnRedTeam(agentIndex):
               score = -score
             state.data.scoreChange += score
@@ -742,8 +744,8 @@ class AgentRules:
             agentState.ownFlag = False
             agentState.configuration = agentState.start
             agentState.scaredTimer = 0
-          else:
-            score = KILL_POINTS
+          else: # other agent is a scared ghost
+            score = KILL_POINTS_GHOST
             if state.isOnRedTeam(agentIndex):
               score = -score
             state.data.scoreChange += score
@@ -753,7 +755,7 @@ class AgentRules:
             otherAgentState.scaredTimer = 0
             if agentState.ownFlag:
               AgentRules.dumpFoodFromDeath(state, agentState, agentIndex)
-              score = KILL_POINTS
+              score = KILL_POINTS_PACMAN
               if state.isOnRedTeam(agentIndex):
                 score = -score
               state.data.scoreChange += score
@@ -768,11 +770,11 @@ class AgentRules:
         pacPos = otherAgentState.getPosition()
         if pacPos == None: continue
         if manhattanDistance( pacPos, agentState.getPosition() ) <= COLLISION_TOLERANCE:
-          #award points to the other team for killing Pacmen
+          # award points to our team for killing Pacmen
           if agentState.scaredTimer <= 0 and not agentState.ownFlag:
             AgentRules.dumpFoodFromDeath(state, otherAgentState, agentIndex)
 
-            score = KILL_POINTS
+            score = KILL_POINTS_PACMAN
             if not state.isOnRedTeam(agentIndex):
               score = -score
             state.data.scoreChange += score
@@ -780,8 +782,8 @@ class AgentRules:
             otherAgentState.ownFlag = False
             otherAgentState.configuration = otherAgentState.start
             otherAgentState.scaredTimer = 0
-          else:
-            score = KILL_POINTS
+          else: # our agent is a scared ghost
+            score = KILL_POINTS_GHOST
             if state.isOnRedTeam(agentIndex):
               score = -score
             state.data.scoreChange += score
@@ -791,7 +793,7 @@ class AgentRules:
             agentState.scaredTimer = 0
             if otherAgentState.ownFlag:
               AgentRules.dumpFoodFromDeath(state, otherAgentState, agentIndex)              
-              score = KILL_POINTS
+              score = KILL_POINTS_PACMAN
               if not state.isOnRedTeam(agentIndex):
                 score = -score
               state.data.scoreChange += score
@@ -871,7 +873,7 @@ def readCommand( argv ):
   parser.add_option('-z', '--zoom', type='float', dest='zoom',
                     help=default('Zoom in the graphics'), default=1)
   parser.add_option('-i', '--time', type='int', dest='time',
-                    help=default('TIME limit of a game in moves'), default=1200, metavar='TIME')
+                    help=default('TIME limit of a game in moves'), default=1800, metavar='TIME')
                     # TODO defaul time is here
   parser.add_option('-n', '--numGames', type='int',
                     help=default('Number of games to play'), default=1)
