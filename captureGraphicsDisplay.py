@@ -66,7 +66,7 @@ PACMAN_SCALE = 0.5
 
 # TODO flag 
 FLAG_COLOR = formatColor(0,1,0)
-FLAG_SIZE = 0.5
+FLAG_SIZE = 0.3
 # Food
 FOOD_COLOR = formatColor(1,1,1)
 FOOD_SIZE = 0.1
