@@ -59,7 +59,7 @@ GHOST_SIZE = 0.65
 SCARED_COLOR = formatColor(1,1,1)
 
 GHOST_VEC_COLORS = map(colorToVector, GHOST_COLORS)
-
+FLAG_AGENT_COLOR = formatColor(0,1,0)
 PACMAN_COLOR = formatColor(255.0/255.0,255.0/255.0,61.0/255)
 PACMAN_SCALE = 0.5
 #pacman_speed = 0.25
@@ -304,8 +304,11 @@ class PacmanGraphics:
     width = PACMAN_OUTLINE_WIDTH
     outlineColor = PACMAN_COLOR
     fillColor = PACMAN_COLOR
-
-    if self.capture:
+    if pacman.ownFlag:
+      outlineColor = TEAM_COLORS[index % 2]
+      fillColor = FLAG_AGENT_COLOR
+      width = PACMAN_CAPTURE_OUTLINE_WIDTH
+    elif self.capture:
       outlineColor = TEAM_COLORS[index % 2]
       fillColor = GHOST_COLORS[index]
       width = PACMAN_CAPTURE_OUTLINE_WIDTH
@@ -361,6 +364,8 @@ class PacmanGraphics:
   def getGhostColor(self, ghost, ghostIndex):
     if ghost.scaredTimer > 0:
       return SCARED_COLOR
+    elif ghost.ownFlag:
+      return FLAG_AGENT_COLOR
     else:
       return GHOST_COLORS[ghostIndex]
 
