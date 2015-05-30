@@ -721,59 +721,74 @@ class AgentRules:
 # TODO when pacman has flag it could be eaten by the other pacman or ghost
   def checkDeath( state, agentIndex):
     agentState = state.data.agentStates[agentIndex]
+    
     if state.isOnRedTeam(agentIndex):
       otherTeam = state.getBlueTeamIndices()
     else:
       otherTeam = state.getRedTeamIndices()
-    if agentState.isPacman:
+      
+    if agentState.isPacman: # Agent is a pacman
       for index in otherTeam:
+          
         otherAgentState = state.data.agentStates[index]
         if otherAgentState.isPacman: continue
+            
         ghostPosition = otherAgentState.getPosition()
         if ghostPosition == None: continue
+        
+        # collision
         if manhattanDistance( ghostPosition, agentState.getPosition() ) <= COLLISION_TOLERANCE:
-          # award points to the other team for killing Pacmen
-          if otherAgentState.scaredTimer <= 0 and not otherAgentState.ownFlag:
+          if otherAgentState.scaredTimer <= 0 and not otherAgentState.ownFlag: # other agent is a ghost without flag
             AgentRules.dumpFoodFromDeath(state, agentState, agentIndex)
-
+            
+            # our pacman die
             score = KILL_POINTS_PACMAN
-            if state.isOnRedTeam(agentIndex):
+            if state.isOnRedTeam(agentIndex): # if we are red
               score = -score
             state.data.scoreChange += score
             agentState.isPacman = False
             agentState.ownFlag = False
             agentState.configuration = agentState.start
             agentState.scaredTimer = 0
+            
           else: # other agent is a scared ghost
+            # other ghost die
             score = KILL_POINTS_GHOST
-            if state.isOnRedTeam(agentIndex):
+            if not state.isOnRedTeam(agentIndex): # if we are blue
               score = -score
             state.data.scoreChange += score
             otherAgentState.isPacman = False
             otherAgentState.ownFlag = False
             otherAgentState.configuration = otherAgentState.start
             otherAgentState.scaredTimer = 0
+            
             if agentState.ownFlag:
               AgentRules.dumpFoodFromDeath(state, agentState, agentIndex)
-              score = KILL_POINTS_PACMAN
+              
+              score = KILL_POINTS_PACMAN              
               if state.isOnRedTeam(agentIndex):
                 score = -score
               state.data.scoreChange += score
               agentState.isPacman = False
               agentState.ownFlag = False
               agentState.configuration = agentState.start
-              agentState.scaredTimer = 0                
+              agentState.scaredTimer = 0
+                
     else: # Agent is a ghost
       for index in otherTeam:
+          
         otherAgentState = state.data.agentStates[index]
         if not otherAgentState.isPacman: continue
+            
         pacPos = otherAgentState.getPosition()
         if pacPos == None: continue
+        
+        # collision
         if manhattanDistance( pacPos, agentState.getPosition() ) <= COLLISION_TOLERANCE:
-          # award points to our team for killing Pacmen
-          if agentState.scaredTimer <= 0 and not agentState.ownFlag:
+          if agentState.scaredTimer <= 0 and not agentState.ownFlag: # our agent is a ghost without flag
             AgentRules.dumpFoodFromDeath(state, otherAgentState, agentIndex)
-
+            
+            # other pacman die
             score = KILL_POINTS_PACMAN
             if not state.isOnRedTeam(agentIndex):
               score = -score
@@ -782,6 +797,7 @@ class AgentRules:
             otherAgentState.ownFlag = False
             otherAgentState.configuration = otherAgentState.start
             otherAgentState.scaredTimer = 0
+            
           else: # our agent is a scared ghost
             score = KILL_POINTS_GHOST
             if state.isOnRedTeam(agentIndex):
@@ -791,8 +807,10 @@ class AgentRules:
             agentState.ownFlag = False
             agentState.configuration = agentState.start
             agentState.scaredTimer = 0
-            if otherAgentState.ownFlag:
-              AgentRules.dumpFoodFromDeath(state, otherAgentState, agentIndex)              
+            
+            if otherAgentState.ownFlag:  
+              AgentRules.dumpFoodFromDeath(state, otherAgentState, agentIndex)      
+              
               score = KILL_POINTS_PACMAN
               if not state.isOnRedTeam(agentIndex):
                 score = -score
