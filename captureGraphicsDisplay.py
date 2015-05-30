@@ -334,7 +334,9 @@ class PacmanGraphics:
       endpoints = (0+delta, 0-delta)
     return endpoints
 
-  def movePacman(self, position, direction, image):
+  def movePacman(self, pacman, position, direction, image):
+    if pacman.ownFlag:
+      edit(image[0], ('fill', FLAG_AGENT_COLOR), ('width', PACMAN_CAPTURE_OUTLINE_WIDTH))
     screenPosition = self.to_screen(position)
     endpoints = self.getEndpoints( direction, position )
     r = PACMAN_SCALE * self.gridSize
@@ -354,18 +356,16 @@ class PacmanGraphics:
       frames = 4.0
       for i in range(1,int(frames) + 1):
         pos = px*i/frames + fx*(frames-i)/frames, py*i/frames + fy*(frames-i)/frames
-        self.movePacman(pos, self.getDirection(pacman), image)
+        self.movePacman(pacman, pos, self.getDirection(pacman), image)
         refresh()
         sleep(abs(self.frameTime) / frames)
     else:
-      self.movePacman(self.getPosition(pacman), self.getDirection(pacman), image)
+      self.movePacman(pacman, self.getPosition(pacman), self.getDirection(pacman), image)
     refresh()
 
   def getGhostColor(self, ghost, ghostIndex):
     if ghost.scaredTimer > 0:
       return SCARED_COLOR
-    elif ghost.ownFlag:
-      return FLAG_AGENT_COLOR
     else:
       return GHOST_COLORS[ghostIndex]
 
@@ -381,7 +381,8 @@ class PacmanGraphics:
     body = polygon(coords, colour, filled = 1)
     WHITE = formatColor(1.0, 1.0, 1.0)
     BLACK = formatColor(0.0, 0.0, 0.0)
-
+    if ghost.ownFlag:
+      edit(body, ('fill', colour), ('outline', FLAG_AGENT_COLOR), ('width', PACMAN_CAPTURE_OUTLINE_WIDTH - 1))
     dx = 0
     dy = 0
     if dir == 'North':
@@ -435,7 +436,10 @@ class PacmanGraphics:
       color = SCARED_COLOR
     else:
       color = GHOST_COLORS[ghostIndex]
-    edit(ghostImageParts[0], ('fill', color), ('outline', color))
+    if ghost.ownFlag:
+      edit(ghostImageParts[0], ('fill', color), ('outline', FLAG_AGENT_COLOR), ('width', 3))
+    else:
+      edit(ghostImageParts[0], ('fill', color), ('outline', color))
     self.moveEyes(self.getPosition(ghost), self.getDirection(ghost), ghostImageParts[-4:])
     refresh()
 
